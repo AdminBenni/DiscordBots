@@ -18,8 +18,9 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-# Python Config Files
+# Python/Pycharm Config Files
 __pycache__
+.idea
 
 # =========================
 # Operating System Files

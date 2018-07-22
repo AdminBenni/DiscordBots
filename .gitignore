@@ -18,6 +18,9 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+# Private info
+BotTokens.py
+
 # Python/Pycharm Config Files
 __pycache__
 .idea

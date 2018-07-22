@@ -183,15 +183,20 @@ class User:
     def end_own_bet(self):
         self.__bet_game = None
 
-    def end_bet(self, betID, winning_opt):
+    def end_bet(self, betID, winning_opt, client):
         try:
+            win = False
             if self.__ongoing_bets[betID][0] == winning_opt:
                 self.__bet_wins += 1
+                self.__amount += 2 * self.__ongoing_bets[betID][1]
+                win = True
             else:
                 self.__bet_losses += 1
             self.__bet_games += 1
             self.__ongoing_bets.pop(betID)
-        except KeyError: pass
+            return win
+        except KeyError:
+            return None
 
     def choose_bet(self, betID, opt, amount):
         self.update_snm_points()

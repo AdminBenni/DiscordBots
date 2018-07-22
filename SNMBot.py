@@ -5,8 +5,12 @@ from discord.ext import commands
 import time
 from random import choice
 from blib import *
-try: from BotResources import *
-except ModuleNotFoundError: from DiscordBots.BotResources import *
+try:
+    from BotResources import *
+    from BotTokens import *
+except ModuleNotFoundError:
+    from DiscordBots.BotResources import *
+    from DiscordBots.BotTokens import *
 
 
 Client = discord.Client()
@@ -63,7 +67,7 @@ async def on_message(mes):
         try:    # Tries to print the users id, name and message contents in a manner where if the user has not been created by the bot it will cause an error and get caught by the except statement
             print(users[mes.author.id].userID + "\n" + str(mes.author) + ": " + mes.content + "\nResponse:")
         except KeyError:    # Creates a new user
-            users[mes.author.id] = User(mes.author.id, last_snm_point_update=datetime.now())
+            users[mes.author.id] = User(mes.author.id, last_snm_point_update=datetime.datetime.now())
             print(mes.author.id + "\n" + str(mes.author) + ": " + mes.content + "\nResponse:\nCreated new user")
         user = users[mes.author.id]
         '''     Filters and other higher priority checks      '''
@@ -111,7 +115,7 @@ async def on_message(mes):
             )
         elif mes.content.lower().startswith("!snmp"):
             print("Displayed users snmp")
-            await client.send_message(mes.author, "You have " + str(user.snm_points) + "SNM Points <@" + user.userID + ">!")
+            await client.send_message(mes.author, "You have " + str(user.snm_points) + " SNM Points <@" + user.userID + ">!")
         elif mes.content.lower().startswith("!startbet "):
             if user.bet_game is not None:
                 print("Told use to end their ongiong bet first")
@@ -140,6 +144,18 @@ async def on_message(mes):
             except KeyError:
                 print("Alerted user that bet user does not exit")
                 await client.send_message(mes.author, "User <@" + bet_user + "> does not exist!")
+        elif mes.content.lower().startswith("!endbet "):
+            if user.bet_game is None:
+                print("Alerted user that they have no ongoing bet")
+                await client.send_message(mes.author, "You have no ongoing bets!")
+            else:
+                winning_option = int(mes.content.split()[1])
+                for x in users.values():
+                    bet_result = x.end_bet(x.userID, winning_option)
+                    if  bet_result:
+                        
+                    elif bet_result is not None:
+
         elif "no u" in mes.content.lower():
             print("Corrected users pubescent insult")
             await client.send_message(
@@ -153,4 +169,4 @@ async def on_message(mes):
             f.write(str(users))
 
 
-client.run("NDY2NzE4MzIyMTY0MTA1MjE2.DilKtQ.OIUu-fTBigSfM8DvdhXU0pTkiS8")
+client.run(bots["snmbot"])

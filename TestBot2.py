@@ -23,8 +23,7 @@ async def on_ready():
 async def on_message(mes):
     print(mes.author, ":", mes.content)
     if mes.content == "lll":
-        await client.send_message(mes.channel, "!startbet Option One, Option Two")
-    elif mes.content == "lll2":
-        await client.send_message(mes.channel, "!endbet 1")
+        time.sleep(3)
+        await client.send_message(mes.channel, "!bet <@466676207606300697> 2 1")
 
-client.run(bots["testbot"])
+client.run(bots["testbot2"])

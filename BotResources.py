@@ -73,9 +73,10 @@ class RPSGame:
 
 '''     Class that handles betting      '''
 class Bet:
-    def __init__(self, userID, opts):
+    def __init__(self, userID, opts, pool={}):
         self.__userID = userID
         self.__opts = opts
+        self.__pool = pool
 
     @property
     def userID(self):
@@ -84,6 +85,14 @@ class Bet:
     @property
     def opts(self):
         return self.__opts
+
+    @property
+    def pool(self):
+        return self.__pool
+
+    def add_pool(self, opt, amount):
+        try: self.__pool[opt] += amount
+        except KeyError: self.__pool[opt] = amount
 
     def __str__(self):
         return str(vars(self))
@@ -95,6 +104,7 @@ class Bet:
 class User:
     def __init__(self, userID, rps_games=0, rps_wins=0, rps_losses=0, rps_game=None, snm_points=0, last_snm_point_update=None, bet_games=0, bet_wins=0, bet_losses=0, bet_game=None, ongoing_bets={}):
         self.__userID = userID
+        #self.__userObject = userObject
         self.__rps_games = rps_games
         self.__rps_wins = rps_wins
         self.__rps_losses = rps_losses
@@ -110,6 +120,10 @@ class User:
     @property
     def userID(self):
         return self.__userID
+
+    '''@property
+    def userObject(self):
+        return self.__userObject'''
 
     @property
     def rps_games(self):
@@ -183,24 +197,26 @@ class User:
     def end_own_bet(self):
         self.__bet_game = None
 
-    def end_bet(self, betID, winning_opt, client):
+    def end_bet(self, ussr, winning_opt):
         try:
             win = False
-            if self.__ongoing_bets[betID][0] == winning_opt:
+            print("ongoing bets" + self.__userID, self.__ongoing_bets, winning_opt, ussr.userID)
+            if self.__ongoing_bets[ussr.userID][0] == winning_opt:
                 self.__bet_wins += 1
-                self.__amount += 2 * self.__ongoing_bets[betID][1]
+                self.__snm_points += round((self.__ongoing_bets[ussr.userID][1] / ussr.bet_game.pool[winning_opt]) * sum(ussr.bet_game.pool.values()))
                 win = True
             else:
                 self.__bet_losses += 1
             self.__bet_games += 1
-            self.__ongoing_bets.pop(betID)
+            self.__ongoing_bets.pop(ussr.userID)
             return win
         except KeyError:
             return None
 
-    def choose_bet(self, betID, opt, amount):
+    def choose_bet(self, ussr, opt, amount):
         self.update_snm_points()
-        self.__ongoing_bets[betID] = [opt, amount]
+        self.__ongoing_bets[ussr.userID] = [opt, amount]
+        ussr.bet_game.add_pool(opt, amount)
         self.__snm_points -= amount
 
     def __str__(self):
